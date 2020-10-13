@@ -18,7 +18,7 @@ object TestGraphX {
 
     val idMappings: List[(Long, Long)] = list.tail.map(e => (e._1.toLong, list.head._1.toLong))
 
-    val ED: RDD[Edge[Int]] = sc.parallelize(idMappings).map(e => Edge(e._1, e._2, 0))
+    val ED: RDD[Edge[String]] = sc.parallelize(idMappings).map(e => Edge(e._1, e._2))
 
     val vertices: VertexRDD[VertexId] = Graph(VD, ED).connectedComponents().vertices
 

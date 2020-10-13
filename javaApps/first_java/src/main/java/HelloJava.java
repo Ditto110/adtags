@@ -1,5 +1,3 @@
-package com.fengmang.stat.java;
-
 /**
  * Created by IntelliJ IDEA.
  *
