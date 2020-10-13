@@ -5,6 +5,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 
+/**
+ * 共同友好关系计算
+ */
 object TestGraphX {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf().setAppName(this.getClass.getName).setMaster("local[*]")
