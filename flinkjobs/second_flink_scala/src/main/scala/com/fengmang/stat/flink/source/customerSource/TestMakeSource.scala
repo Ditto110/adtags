@@ -1,4 +1,4 @@
-package com.fengmang.stat.flink.customerSource
+package com.fengmang.stat.flink.source.customerSource
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
