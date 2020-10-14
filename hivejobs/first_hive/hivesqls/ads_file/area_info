@@ -1,0 +1,35 @@
+-- created by: jiangbo
+-- created date: 2020-10-13
+-- desc area_info ads
+
+set hive.execution.engine = mr;
+
+add jar /opt/cloudera/parcels/CDH/jars/elasticsearch-hadoop-7.2.0.jar;
+add jar /opt/cloudera/parcels/CDH/jars/commons-httpclient-3.1.jar;
+
+CREATE TABLE IF NOT EXISTS db_dmp_usertags.area_info
+(
+    code  string comment '地区编码',
+    name  string comment '地区名称',
+    level int comment '地区分级'
+) STORED BY 'org.elasticsearch.hadoop.hive.EsStorageHandler' TBLPROPERTIES (
+    'es.resource' = 'db_dmp_usertags.area_info/_doc',
+    'es.mapping.date.rich' = 'false',
+    'es.write.operation' = 'upsert',
+    'es.nodes' = '172.28.63.125',
+    'es.port' = '9200',
+    'es.net.http.auth.user' = 'elastic',
+    'es.net.http.auth.pass' = 'fengmang@2020',
+    'es.index.auto.create' = 'true',
+    'es.index.read.missing.as.empty' = 'false'
+    );
+
+INSERT OVERWRITE TABLE db_dmp_usertags.area_info
+SELECT
+    code,
+    name,
+    level
+from
+    db_dmp_usertags.dim_area_info
+order by code;
+
