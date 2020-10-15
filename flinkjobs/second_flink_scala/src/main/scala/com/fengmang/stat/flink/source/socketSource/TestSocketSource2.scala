@@ -1,12 +1,19 @@
 package com.fengmang.stat.flink.source.socketSource
 
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.{Date, Properties}
 
+import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
+import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.watermark.Watermark
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
+import org.apache.flink.util.Collector
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
  *
@@ -23,60 +30,93 @@ object TestSocketSource2 {
 
     import org.apache.flink.api.scala._
 
-    val value: DataStream[String] = env.socketTextStream("192.168.52.13", 9999)
+    val prop = new Properties
+    prop.setProperty("bootstrap.servers", "192.168.52.40:9092,192.168.52.41:9092")
+    prop.setProperty("zookeeper.connect", "172.28.17.80")
+    prop.setProperty("group.id", "default_group_id")
+    val consumer = new FlinkKafkaConsumer010[String]("flink-test", new SimpleStringSchema, prop)
 
+    consumer.setStartFromGroupOffsets()
 
-    value.filter(!_.isEmpty).flatMap(_.split(",")).map((_, new Date().getTime))
-      .assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(String, Long)] {     //生成watermark
+    env.addSource(consumer)
+      .filter(!_.isEmpty)
+      .map(f => {
+        val arr = f.split(",")
+        val code = arr(0)
+        val time = parseDateNewFormat(arr(1)).getTime
+        //        val time = arr(1).toLong
+        (code, time)
+      })
+      .assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(String, Long)] {
 
         var currentMaxTimestamp = 0L
-        val maxOutOfOrderness = 10000L
+        val maxOutOfOrderness = 10000L // 最大允许的乱序时间是10s
+        var a: Watermark = null
+        val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 
+        //Returns the current watermark
         override def getCurrentWatermark: Watermark = {
-
-          val watermark = new Watermark(maxOutOfOrderness - currentMaxTimestamp)
-
-          println(watermark)
-
-          watermark
-
+          a = new Watermark(currentMaxTimestamp - maxOutOfOrderness)
+          a
         }
 
-        override def extractTimestamp(t: (String, Long), l: Long): Long = {
-          //当前元素的时间戳
-          val timestamp: Long = t._2
+        //Assigns a timestamp to an element, in milliseconds since the Epoch.
+        override def extractTimestamp(element: (String, Long), previousElementTimestamp: Long): Long = {
 
-          currentMaxTimestamp= Math.max(timestamp, l)
+          currentMaxTimestamp = Math.max(currentMaxTimestamp, element._2)
 
-          timestamp
+          println("timestamp:" + element._1 + "," + element._2 + "," + sdf.format(element._2) + " ||| "
+            + currentMaxTimestamp + "," + sdf.format(currentMaxTimestamp) + " ||| "
+            + new Date(getNewFormatDateString(a)))
+
+          element._2
         }
-      }).keyBy(0).window(TumblingEventTimeWindows.of(Time.seconds(3)))
-        .allowedLateness(Time.seconds(1)).sum(1)
-        /*.process(new ProcessWindowFunction[(String,Long),(String,Long),String,TimeWindow]{
+      })
+      .keyBy(_._1)
+      .timeWindow(Time.seconds(5))
+      .process(new ProcessWindowFunction[(String, Long), String, String, TimeWindow] {
+        override def process(key: String, context: Context, elements: Iterable[(String, Long)], out: Collector[String]): Unit = {
 
-          override def process(key: String,
-                               context: ProcessWindowFunction[(String, Long), (String, Long), String, TimeWindow]#Context,
-                               elements: lang.Iterable[(String, Long)],
-                               out: Collector[(String, Long)]): Unit = {
+          val tuples = new ArrayBuffer[(String, Long)]()
 
-            val it: util.Iterator[(String, Long)] = elements.iterator()
+          println(s"key:$key")
+          println(s"window start:${strfDate(context.window.getStart)},end:${strfDate(context.window.getEnd)}")
+          println(s"currentWatermark:${context.currentWatermark}")
 
-            while (it.hasNext) {
-
-
-            }
-
+          val it: Iterator[(String, Long)] = elements.iterator
+          while (it.hasNext) {
+            val tuple: (String, Long) = it.next()
+            tuples += tuple
           }
-        })*/
+          out.collect(tuples.head._2.toString)
+        }
+      }).print()
 
-    value.print("socket")
+    env.execute()
 
-    try {
-      env.execute()
-    } catch {
-      case exception: Exception => println(exception)
+  }
+
+  def parseDateNewFormat(t: String): Date = {
+
+    val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+    val date: Date = sdf.parse(t)
+
+    date
+  }
+
+  def getNewFormatDateString(a: Watermark) = {
+
+    a match {
+      case x if x == null => 0L
+      case _ => a.getTimestamp
     }
+  }
 
+  def strfDate(time: Long): String = {
+    val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val date = new Date(time)
+    sdf.format(date)
   }
 
 }
