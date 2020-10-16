@@ -3,7 +3,7 @@ package com.fengmang.stat.flink.source.socketSource
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
-import com.fengmang.stat.flink.source.socketSource.TestSocketSource2.strfDate
+import com.fengmang.stat.flink.source.socketSource.TestKafkaSource.strfDate
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
@@ -26,7 +26,7 @@ import scala.collection.mutable.ArrayBuffer
  * @create 2020/10/14 10:55
  *
  */
-object TestSocketSource4 {
+object TestKafkaSource1 {
   def main(args: Array[String]): Unit = {
 
     //设置环境

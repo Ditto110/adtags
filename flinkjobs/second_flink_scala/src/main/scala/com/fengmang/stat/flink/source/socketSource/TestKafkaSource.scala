@@ -23,7 +23,7 @@ import scala.collection.mutable.ArrayBuffer
  * @create 2020/10/14 10:55
  *
  */
-object TestSocketSource2 {
+object TestKafkaSource {
   def main(args: Array[String]): Unit = {
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
