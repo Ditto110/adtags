@@ -1,0 +1,5 @@
+Table  table = tEnv.scan("students")
+                   .where("score > 90")
+                   .window(Tumble.over("10.minutes").on("processingTime").as("w"))
+                   .groupBy(<"w, sex")
+                   .select("sex, utc2local(w.start), utc2local(w.end), sex.count");

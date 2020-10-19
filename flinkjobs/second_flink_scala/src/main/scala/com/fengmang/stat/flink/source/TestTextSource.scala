@@ -1,16 +1,14 @@
-package com.fengmang.stat.flink.source.socketSource
+package com.fengmang.stat.flink.source
 
-import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.api.scala.typeutils.Types
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
-import org.apache.flink.table.api.{EnvironmentSettings, Table}
-import org.apache.flink.table.api.scala.StreamTableEnvironment
-import org.apache.flink.table.sources.CsvTableSource
-import org.apache.flink.api.scala._
 import org.apache.flink.core.fs.FileSystem
+import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
+import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.api.{EnvironmentSettings, Table}
 import org.apache.flink.table.sinks.{CsvTableSink, TableSink}
+import org.apache.flink.table.sources.CsvTableSource
 import org.apache.flink.types.Row
-
+import org.apache.flink.api.scala._
 
 /**
  *
