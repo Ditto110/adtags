@@ -1,5 +1,6 @@
 package com.fengmang.stat.flink.source
 
+import org.apache.flink.streaming.api.functions.ProcessFunction
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 
 /**
@@ -26,6 +27,8 @@ object TestSource1 {
 //    value.setParallelism(1).print()   //设置并行度
 
 //    value.print()
+//    value.process(ProcessFunction) 低阶(更底层)流处理算子，实现自定义的业务逻辑
+
     value.print("prefix")
 
     try {

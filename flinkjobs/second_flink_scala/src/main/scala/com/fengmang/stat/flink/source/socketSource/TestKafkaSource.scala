@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema
-import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
+import org.apache.flink.streaming.api.functions.{AssignerWithPeriodicWatermarks, KeyedProcessFunction}
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.watermark.Watermark
@@ -28,6 +28,7 @@ object TestKafkaSource {
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
+//    env.enableCheckpointing(100L)
     import org.apache.flink.api.scala._
 
     val prop = new Properties
