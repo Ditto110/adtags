@@ -1,7 +1,8 @@
 package com.fengmang.stat.flink.watermark
 
+import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.streaming.api.functions.source.SourceFunction
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
+import org.apache.flink.streaming.api.scala.{DataStream, KeyedStream, StreamExecutionEnvironment}
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
@@ -21,10 +22,18 @@ object TestWatermark1 {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val input: DataStream[(String, Long)] = env.fromCollection(List(("a", 1L), ("b", 1L), ("b", 5L), ("b", 5L)))
-    val timeWindow: DataStream[(String, Long)] = input.assignAscendingTimestamps(t => t._2)
-    val result: DataStream[(String, Long)] = timeWindow.keyBy(0).timeWindow(Time.milliseconds(4)).sum("_2")
+    val value: KeyedStream[(String, Long), Tuple] = input.keyBy(0)
 
-    result.print()
+
+    val value1: KeyedStream[(String, Long), String] = input.keyBy(_._1)
+
+//    value.print()
+
+    value1.print()
+/*    val timeWindow: DataStream[(String, Long)] = input.assignAscendingTimestamps(t => t._2)
+    val result: DataStream[(String, Long)] = timeWindow.keyBy(0).timeWindow(Time.milliseconds(4)).sum("_2")*/
+
+    value.keyBy(0)
 
     env.execute()
 
