@@ -27,8 +27,16 @@ def parse_date():
     print(" parsed time:%s" % parsed_time)
 
 
+# 生成指定日期
+def get_define_date():
+    d = datetime.datetime(2020, 10, 28)
+    print(d)
+
+
 if __name__ == '__main__':
-    get_date()
-    format_date()
-    parse_date()
+    # get_date()
+    # format_date()
+    # parse_date()
+    get_define_date()
+    pass
 
