@@ -1,7 +1,3 @@
-"""
-
-
-"""
 a = ""
 ck = lambda v: True if v == "" else False
 
