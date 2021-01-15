@@ -15,7 +15,7 @@ import java.util.LinkedList;
 public class Test_BinTreeGen {
     private static int[] arr = {1, 2, 3, 4, 5, 6};
     private static LinkedList<Node> nodeLinkedList;
-
+    private Node root;
     private static void createTree() {
         nodeLinkedList = new LinkedList<Node>();
 
@@ -32,6 +32,22 @@ public class Test_BinTreeGen {
         nodeLinkedList.get(mid).leftChild = nodeLinkedList.get(2 * mid + 1);
         if (mid % 2 == 1) {
             nodeLinkedList.get(mid).rightChild = nodeLinkedList.get(2 * mid + 2);
+        }
+    }
+
+    public void insert(int x) {
+
+    }
+
+    private void insert(int x, Node node) {
+        if (node == null) {
+            root = new Node(x);
+        }
+        int compare = x - node.data;
+        if (compare < 0) {
+            insert(x, node.leftChild);
+        } else if (compare >= 0) {
+            insert(x, node.rightChild);
         }
     }
 

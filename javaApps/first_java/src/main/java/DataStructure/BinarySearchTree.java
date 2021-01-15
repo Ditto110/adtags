@@ -1,5 +1,6 @@
 package DataStructure;
 
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 /**
@@ -39,9 +40,14 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements TestBi
         if (compare < 0) {
             node.leftChild = insert(x, node.leftChild);
             ;
-        } else if (compare > 0) {
+        } else {
             node.rightChild = insert(x, node.rightChild);
         }
+        /*
+        * 如果插入的值与节点的值相同，则处理的方式可能有两种：
+        * 1. 当做右子节点处理
+        * 2. 将node 的data通过链表结构实现，即相同的值通过一个链表存储
+        * */
         return node;
     }
 
@@ -129,6 +135,30 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements TestBi
         }
     }
 
+    /**
+     * 通过while实现
+     * @param x
+     * @param node
+     * @return
+     */
+    private boolean contains2(E x, Node<E> node) {
+        if (node == null) {
+            return false;
+        }
+        int compare;
+        while (node != null) {
+            compare = compare(x, node.data);
+            if (compare == 0) {
+                return true;
+            } else if (compare < 0) {
+                node = node.rightChild;
+            } else {
+                node = node.leftChild;
+            }
+        }
+        return false;
+    }
+
     private void checkEmpty() {
         if (isEmpty()) {
             throw new NoSuchElementException();
@@ -208,6 +238,7 @@ public class BinarySearchTree<E extends Comparable<? super E>> implements TestBi
      */
     private static class Node<e> {
         private e data;
+//        private LinkedList<e> linkData;
         private Node<e> leftChild;
         private Node<e> rightChild;
 

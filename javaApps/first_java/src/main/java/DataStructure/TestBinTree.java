@@ -19,6 +19,8 @@ public class TestBinTree {
 
         tree.insert(1);
 
+        tree.insert(5);
+
         tree.printTree();
 
         System.out.println(" ");
